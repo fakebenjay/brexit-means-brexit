@@ -28,8 +28,8 @@
           .outerRadius(radius);
 
         const labelArc = d3.arc()
-          .outerRadius(radius - 40)
-          .innerRadius(radius - 40);
+          .outerRadius(radius)
+          .innerRadius(radius - 80);
 
         function arcTween(a) {
           const i = d3.interpolate(this._current, a);
@@ -50,11 +50,6 @@
               var piePath = pieSVG.selectAll("path")
                 .data(pie(results));
 
-              // var pieG = pieSVG.selectAll("arc")
-              //   .data(pie)
-              //   .enter().append("g")
-              //   .attr("class", "arc");
-
               // Update existing arcs
               piePath.transition().duration(200).attrTween("d", arcTween);
 
@@ -72,11 +67,19 @@
                   this._current = d;
                 });
 
-              // pieG.append("path")
-              //   .attr("d", arc)
-              //   .style("fill", function(d) {
-              //     return color(d.data.letter);
-              //   });
+              var labelArcs = pieSVG.selectAll('arc')
+                .data(pie(results))
+                .enter().append("g")
+                .attr("class", "arc");
+
+              labelArcs.append("text")
+                .attr("transform", function(d) {
+                  return `translate(${labelArc.centroid(d)})`;
+                })
+                .text(function(d) {
+                  return `${d.data}%`;
+                })
+                .style('fill', 'white');
 
               // piePath.append("path")
               //   .attr("transform", function(d) {
