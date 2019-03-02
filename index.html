@@ -28,13 +28,22 @@
           .outerRadius(radius);
 
         const labelArc = d3.arc()
-          .outerRadius(radius)
-          .innerRadius(radius - 80);
+          .outerRadius(radius / 2)
+          .innerRadius(radius / 2);
 
         function arcTween(a) {
           const i = d3.interpolate(this._current, a);
           this._current = i(1);
           return (t) => arc(i(t));
+        }
+
+        function labelArcTween(a) {
+          var i = d3.interpolate(this._current, a);
+          this._current = i(0);
+          this.innerHTML = `${a.data}%`
+          return function(t) {
+            return "translate(" + labelArc.centroid(i(t)) + ")";
+          };
         }
 
         Promise.all([d])
@@ -47,32 +56,36 @@
             function update(val = this.value) {
               // Join new data
               var results = [val.pctLeave, val.pctRemain]
+
               var piePath = pieSVG.selectAll("path")
                 .data(pie(results));
 
+              var labelArcs = pieSVG.selectAll('text')
+                .data(pie(results));
+
               // Update existing arcs
-              piePath.transition().duration(200).attrTween("d", arcTween);
+              piePath.transition()
+                .duration(200)
+                .attrTween("d", arcTween);
+
+              d3.selectAll("text")
+                .data(pie(results))
+                .transition()
+                .duration(200)
+                .attrTween("transform", labelArcTween);
 
               // Enter new arcs
               piePath.enter().append("path")
                 .attr("fill", (d, i) => pieColor(i))
                 .attr("d", arc)
-                // .attr("transform", (d) => {
-                //   debugger
-                //     `translate(${this.radius},${this.radius})`
-                // })
                 .attr("stroke", "white")
                 .attr("stroke-width", "2px")
                 .each(function(d) {
                   this._current = d;
                 });
 
-              var labelArcs = pieSVG.selectAll('arc')
-                .data(pie(results))
-                .enter().append("g")
-                .attr("class", "arc");
-
-              labelArcs.append("text")
+              labelArcs.enter().append("text")
+                .attr("class", "arc")
                 .attr("transform", function(d) {
                   return `translate(${labelArc.centroid(d)})`;
                 })
