@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="//d3js.org/d3.v5.js"></script>
+  <script src="//d3js.org/d3-geo-projection.v2.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    var svg = d3.select("body").append("svg")
+
+    var projection = d3.geoEqualEarth();
+    var path = d3.geoPath()
+      .projection(projection);
+
+    var url = "http://enjalot.github.io/wwsd/data/world/world-110m.geojson";
+    var url2 = "http://enjalot.github.io/wwsd/data/world/ne_50m_populated_places_simple.geojson";
+    Promise.all([d3.json(url)]).then(function(data) {
+      var world_geojson = data[0];
+      debugger
+      svg.append("path")
+        .attr("d", path(world_geojson))
+        .attr("fill", "lightgray")
+
+    })
+  </script>
+</body>

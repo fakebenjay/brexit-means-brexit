@@ -1,0 +1,79 @@
+path:hover {
+    stroke: black;
+    stroke-width: 1;
+}
+
+@font-face {
+    font-family: "klavika-bold";
+    src: url("fonts/Klavika Bold.otf");
+}
+
+@font-face {
+    font-family: "p22-johnston-underground-regular";
+    src: url("fonts/P22 Johnston Underground Regular.ttf");
+}
+
+@font-face {
+    font-family: "resolution-blackletter";
+    src: url("fonts/ResolutionBlackletter.otf");
+}
+
+@font-face {
+    font-family: "wales-sans-headline-regular-web";
+    src: url("fonts/wales-sans-headline-regular-web.ttf");
+}
+
+#infobox>h1 {
+    margin: 0;
+}
+
+div#bottom {
+    position: relative;
+}
+
+div#pie {
+    width: 50%;
+    padding-top: 10px;
+    display: inherit;
+}
+
+.scotland {
+    font-family: klavika-bold, serif;
+    background-color: #FF6600;
+    color: white;
+    padding-left: 1em;
+    padding-top: 0.15em;
+    padding-bottom: 0.10em;
+    border-top: 0.25em solid #525253;
+}
+
+.wales {
+    font-family: wales-sans-headline-regular-web, sans-serif;
+    color: white;
+    background-color: #E31F26;
+    padding-left: 1em;
+    padding-bottom: 0.25em;
+    border-top: 0.25em solid #01AA39;
+}
+
+.england {
+    font-family: p22-johnston-underground-regular, sans-serif;
+    color: #0B0099;
+    padding-left: 1em;
+    padding-top: 0.15em;
+    padding-bottom: 0.10em;
+    border-top: 0.25em solid #FE0006;
+}
+
+.northern-ireland {
+    /* font-family: resolution-blackletter, sans-serif; */
+    font-family: millisime, sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    background-color: #81A930;
+    color: white;
+    padding-left: 1em;
+    padding-top: 0.10em;
+    padding-bottom: 0.15em;
+    border-top: 0.25em solid #278F64;
+}
