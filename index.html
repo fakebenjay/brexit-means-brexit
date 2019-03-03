@@ -4,6 +4,7 @@
   <head>
     <meta charset="utf-8">
     <script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- <script src="https://d3js.org/d3-format.v1.min.js"></script> -->
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
     <title>Brexit Means Brexit</title>
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -37,14 +38,13 @@
           return (t) => arc(i(t));
         }
 
-        function labelArcTween(a) {
-          var i = d3.interpolate(this._current, a);
-          this._current = i(0);
-          this.innerHTML = `${a.data}%`
-          return function(t) {
-            return "translate(" + labelArc.centroid(i(t)) + ")";
-          };
-        }
+        // function labelArcTween(a) {
+        //   var i = d3.interpolate(this._current, a);
+        //   this._current = i(0);
+        //   return function(t) {
+        //     return "translate(" + labelArc.centroid(i(t)) + ")";
+        //   }
+        // }
 
         Promise.all([d])
           .then(function(data) {
@@ -69,10 +69,29 @@
                 .attrTween("d", arcTween);
 
               d3.selectAll("text")
-                .data(pie(results))
                 .transition()
                 .duration(200)
-                .attrTween("transform", labelArcTween);
+                .tween("text", function(a) {
+                  var that = d3.select(this);
+                  var newVal = that.text().replace('%', '')
+                  var oldVal = a.data
+                  var iNum = d3.interpolateNumber(newVal, oldVal);
+                  var format = d3.format(".4");
+                  return function(t) {
+                    that.text(`${format(iNum(t))}%`);
+                  };
+                })
+                .attrTween("transform", function(a) {
+                  // var c = arc.centroid(d);
+                  // return "translate(" + c[0] + "," + c[1] + ")";
+                  var i = d3.interpolate(this._current, a);
+                  this._current = i(0);
+                  return function(t) {
+                    var centroidPt = labelArc.centroid(i(t))
+                    return `translate(${centroidPt[0]},${centroidPt[1]})`;
+                  }
+                });
+              // .attrTween("transform", labelArcTween);
 
               // Enter new arcs
               piePath.enter().append("path")
@@ -87,21 +106,14 @@
               labelArcs.enter().append("text")
                 .attr("class", "arc")
                 .attr("transform", function(d) {
-                  return `translate(${labelArc.centroid(d)})`;
+                  var radius = document.getElementById('pie').offsetWidth / 2
+                  var centroidPt = labelArc.centroid(d)
+                  return `translate(${centroidPt[0]},${centroidPt[1]})translate(-${radius/6}, 0)`;
                 })
                 .text(function(d) {
                   return `${d.data}%`;
                 })
                 .style('fill', 'white');
-
-              // piePath.append("path")
-              //   .attr("transform", function(d) {
-              //     return `translate(${labelArc.centroid(d)})`;
-              //   })
-              //   .text(function(d) {
-              //     return d.data;
-              //   })
-              //   .style("fill", "#fff");
             }
 
             update(data[0].properties);
