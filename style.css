@@ -1,4 +1,4 @@
-path:hover {
+#map-div path:hover {
     stroke: black;
     stroke-width: 1;
 }
@@ -35,6 +35,10 @@ div#pie {
     width: 50%;
     padding-top: 10px;
     display: inherit;
+}
+
+text.arc {
+    font-family: 'Overpass', sans-serif;
 }
 
 .scotland {

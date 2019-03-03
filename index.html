@@ -9,6 +9,7 @@
     <title>Brexit Means Brexit</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" href="https://use.typekit.net/odt8gpj.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
   </head>
 
   <body>
@@ -87,33 +88,40 @@
                   var i = d3.interpolate(this._current, a);
                   this._current = i(0);
                   return function(t) {
+                    var radius = document.getElementById('pie').offsetWidth / 2
                     var centroidPt = labelArc.centroid(i(t))
-                    return `translate(${centroidPt[0]},${centroidPt[1]})`;
+                    return `translate(${centroidPt[0]},${centroidPt[1]})translate(-${radius/7}, 0)`;
                   }
                 });
               // .attrTween("transform", labelArcTween);
 
               // Enter new arcs
-              piePath.enter().append("path")
+              piePath.enter()
+                .append("path")
                 .attr("fill", (d, i) => pieColor(i))
                 .attr("d", arc)
                 .attr("stroke", "white")
                 .attr("stroke-width", "2px")
                 .each(function(d) {
                   this._current = d;
+                  // Store initial angels for transition: http://www.cagrimmett.com/til/2016/08/27/d3-transitions.html
                 });
 
-              labelArcs.enter().append("text")
+              labelArcs.enter()
+                .append("text")
                 .attr("class", "arc")
                 .attr("transform", function(d) {
                   var radius = document.getElementById('pie').offsetWidth / 2
                   var centroidPt = labelArc.centroid(d)
-                  return `translate(${centroidPt[0]},${centroidPt[1]})translate(-${radius/6}, 0)`;
+                  return `translate(${centroidPt[0]},${centroidPt[1]})translate(-${radius/7}, 0)`;
                 })
                 .text(function(d) {
                   return `${d.data}%`;
                 })
-                .style('fill', 'white');
+                .style('fill', 'white')
+                .each(function(d) {
+                  this._current = d;
+                });
             }
 
             update(data[0].properties);
@@ -135,6 +143,8 @@
       var hPie = document.getElementById('pie').offsetWidth;
       var radius = Math.min(wPie, hPie) / 2;
 
+      var pieColor = d3.scaleOrdinal(["#bd1d1e", "#0000a3"]);
+
       var pieSVG = d3.select("#pie")
         .append("svg")
         .attr("width", wPie)
@@ -143,8 +153,6 @@
         //.attr('preserveAspectRatio','xMinYMin')
         .append("g")
         .attr("transform", `translate(${Math.min(wPie, hPie) / 2},${Math.min(wPie, hPie) / 2})`);
-
-      var pieColor = d3.scaleOrdinal(["#bd1d1e", "#0000a3"]);
 
       var mapSVG = d3.select("#map-div").append("svg")
         .attr("width", w)
@@ -174,14 +182,6 @@
       // .range(['#bd1d1e', '#b41830', '#aa1241', '#650a90', '#4a0fa0', '#0a14b0']);
       // .range(['#bd1d1e', '#b11635', '#a50f4a', '#710886', '#530d9b', '#0a14b0']);
       // .range(['#ff0000', '#ee0040', '#dc0068', '#8f00cd', '#6500e8', '#0000ff']);
-
-      // var color = d3.scaleQuantize()
-      //   .domain([0, 100])
-      // .range(['#ff0000', '#0000ff']);
-      // .range(['#ff0000', '#ff0000', '#ff0000', '#ff3b25', '#ff553e', '#5e46fb', '#432dfd', '#0000ff', '#0000ff', '#0000ff']);
-      // .range(['#ff0000', '#ff3b25', '#ff553e', '#ff6954', '#ff7b69', '#8072f6', '#715cf9', '#5e46fb', '#432dfd', '#0000ff']);
-      // .range(['#ff0000', '#f5002d', '#ec0047', '#e0005f', '#8700d3', '#6e00e3', '#4e00f2', '#0000ff']);
-      // .range(['#fa001f', '#f30033', '#ec0045', '#e50055', '#df0062', '#8900d1', '#7b00dc', '#6c00e4', '#5800ee', '#3e00f7']);
 
       var ptileOpacity = d3.scaleLinear()
         .domain([0, 100])
