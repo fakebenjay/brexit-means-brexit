@@ -90,7 +90,7 @@
                   return function(t) {
                     var radius = document.getElementById('pie').offsetWidth / 2
                     var centroidPt = labelArc.centroid(i(t))
-                    return `translate(${centroidPt[0]},${centroidPt[1]})translate(-${radius/7}, 0)`;
+                    return `translate(${centroidPt[0]},${centroidPt[1]})`;
                   }
                 });
               // .attrTween("transform", labelArcTween);
@@ -113,8 +113,9 @@
                 .attr("transform", function(d) {
                   var radius = document.getElementById('pie').offsetWidth / 2
                   var centroidPt = labelArc.centroid(d)
-                  return `translate(${centroidPt[0]},${centroidPt[1]})translate(-${radius/7}, 0)`;
+                  return `translate(${centroidPt[0]},${centroidPt[1]})`;
                 })
+                .attr("text-anchor", "middle")
                 .text(function(d) {
                   return `${d.data}%`;
                 })
