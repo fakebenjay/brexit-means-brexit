@@ -16,10 +16,103 @@
     <div id="map-div" class="vh-100 w-50 fl"></div>
     <div id="infobox" class="vh-100 w-50 fr">
       <h1 id="dist-name"></h1>
-      <div id="pie"></div>
+      <div id="pie" class="w-50 fl"></div>
+      <div id="stats" class="w-50 fr"></div>
+      <div id="pct-bar-percap" style="clear: both;" class="pct-bar w-100 h3"></div>
+      <br>
+      <div id="pct-bar-electorate" style="clear: both;" class="pct-bar w-100 h3"></div>
+      <br>
+      <div id="pct-bar-total" style="clear: both;" class="pct-bar w-100 h3"></div>
     </div>
-    <div id="bottom" style="clear: both;" class="vh-100 w-100 bg-blue"></div>
     <script type="text/javascript">
+      function horizBarPerCap(d, i) {
+        Promise.all([d3.csv("pandas/output/spending_percap_ptile.csv"), d])
+          .then(function(data) {
+            var councilsAll = data[0].sort((a, b) => {
+              return parseFloat(a.pct_remain) - parseFloat(b.pct_remain);
+            })
+            d3.select('#pct-bar-percap').selectAll("div")
+              .data(councilsAll)
+              .enter()
+              .append('div')
+              .attr('class', 'bar')
+              .style('height', `${hBar}px`)
+              .style('width', (d) => {
+                return `${barWidthScalePC(d.spending_per_voter)}%`
+              })
+              .style('background-color', (d) => {
+                return barColorScale(d.pct_remain)
+              });
+          })
+      }
+
+      function horizBar(d, i, propsObj) {
+        Promise.all([d3.csv("pandas/output/spending_percap_ptile.csv"), d, propsObj])
+          .then(function(data) {
+            var councilsAll = data[0].sort((a, b) => {
+              return parseFloat(a.pct_remain) - parseFloat(b.pct_remain);
+            })
+            var scale = data[2].scale
+            var divID = data[2].divID
+            var keyName = data[2].keyName
+
+            d3.select('divID').selectAll("div")
+              .data(councilsAll)
+              .enter()
+              .append('div')
+              .attr('class', 'bar')
+              .style('height', `${hBar}px`)
+              .style('width', (d) => {
+                return `${scale(d['keyName'])}%`
+              })
+              .style('background-color', (d) => {
+                return barColorScale(d.pct_remain)
+              });
+          })
+      }
+
+      function horizBarElectorate(d, i) {
+        Promise.all([d3.csv("pandas/output/spending_percap_ptile.csv"), d])
+          .then(function(data) {
+            var councilsAll = data[0].sort((a, b) => {
+              return parseFloat(a.pct_remain) - parseFloat(b.pct_remain);
+            })
+            d3.select('#pct-bar-electorate').selectAll("div")
+              .data(councilsAll)
+              .enter()
+              .append('div')
+              .attr('class', 'bar')
+              .style('height', `${hBar}px`)
+              .style('width', (d) => {
+                return `${barWidthScaleElectorate(d.electorate)}%`
+              })
+              .style('background-color', (d) => {
+                return barColorScale(d.pct_remain)
+              });
+          })
+      }
+
+      function horizBarTotal(d, i) {
+        Promise.all([d3.csv("pandas/output/spending_percap_ptile.csv"), d])
+          .then(function(data) {
+            var councilsAll = data[0].sort((a, b) => {
+              return parseFloat(a.pct_remain) - parseFloat(b.pct_remain);
+            })
+            d3.select('#pct-bar-total').selectAll("div")
+              .data(councilsAll)
+              .enter()
+              .append('div')
+              .attr('class', 'bar')
+              .style('height', `${hBar}px`)
+              .style('width', (d) => {
+                return `${barWidthScaleTotal(d.project_eu_contribution_gbp)}%`
+              })
+              .style('background-color', (d) => {
+                return barColorScale(d.pct_remain)
+              });
+          })
+      }
+
       function drawPie(d, i) {
         var pie = d3.pie()
           .value(d => d)
@@ -129,16 +222,28 @@
           })
       }
 
-      var w = document.querySelector('#map-div').offsetWidth;
-      var h = document.querySelector('#map-div').offsetHeight * .99;
+      var wBar = document.getElementById('pct-bar-percap').offsetWidth;
+      var hBar = document.getElementById('pct-bar-percap').offsetHeight;
 
-      // var zoom = d3.zoom()
-      //   .scaleExtent([1, 10])
-      //   .translateTo(projection.translate())
-      //   .scaleTo(projection.scale())
-      //   .on("zoom", function() {
-      //     svg.attr("transform", d3.event.transform)
-      //   });
+      //100321726921.54 total EU spending
+      //1013925.169 per capita council sum
+      //46475882 eligible voters
+
+      var barWidthScalePC = d3.scaleLinear()
+        .domain([0, 1013925.169])
+        .range([0, 100]);
+
+      var barWidthScaleElectorate = d3.scaleLinear()
+        .domain([0, 46475882])
+        .range([0, 100]);
+
+      var barWidthScaleTotal = d3.scaleLinear()
+        .domain([0, 100321726921.54])
+        .range([0, 100]);
+
+      var barColorScale = d3.scaleQuantize()
+        .domain([20, 80])
+        .range(['#bd1d1e', '#d76150', '#eb9788', '#9d80d3', '#6644bb', '#0000a3']);
 
       var wPie = document.getElementById('pie').offsetWidth;
       var hPie = document.getElementById('pie').offsetWidth;
@@ -154,6 +259,9 @@
         //.attr('preserveAspectRatio','xMinYMin')
         .append("g")
         .attr("transform", `translate(${Math.min(wPie, hPie) / 2},${Math.min(wPie, hPie) / 2})`);
+
+      var w = document.querySelector('#map-div').offsetWidth;
+      var h = document.querySelector('#map-div').offsetHeight * .99;
 
       var mapSVG = d3.select("#map-div").append("svg")
         .attr("width", w)
@@ -264,6 +372,12 @@
               header.className = 'england'
             }
             drawPie(d, i)
+            // horizBar(d, i)
+            // horizBar(d, i)
+            // horizBar(d, i)
+            horizBarPerCap(d, i)
+            horizBarTotal(d, i)
+            horizBarElectorate(d, i)
           });
       });
     </script>
