@@ -18,97 +18,67 @@
       <h1 id="dist-name"></h1>
       <div id="pie" class="w-50 fl"></div>
       <div id="stats" class="w-50 fr"></div>
-      <div id="pct-bar-percap" style="clear: both;" class="pct-bar w-100 h3"></div>
-      <br>
-      <div id="pct-bar-electorate" style="clear: both;" class="pct-bar w-100 h3"></div>
-      <br>
-      <div id="pct-bar-total" style="clear: both;" class="pct-bar w-100 h3"></div>
+      <br></br>
+      <div id="bars" style="clear: both;">
+        <label for="#pct-bar-percap">EU spending, normalized per eligible voter (£1,013,925.17)</label>
+        <div id="pct-bar-percap" style="clear: both;" class="pct-bar w-90 h3"></div>
+        <br>
+        <label for="#pct-bar-electorate">Eligible voters (46,475,882)</label>
+        <div id="pct-bar-electorate" style="clear: both;" class="pct-bar w-90 h3"></div>
+        <br>
+        <label for="#pct-bar-total">Total EU spending (£100,321,726,921.54)</label>
+        <div id="pct-bar-total" style="clear: both;" class="pct-bar w-90 h3"></div>
+      </div>
     </div>
     <script type="text/javascript">
-      function horizBarPerCap(d, i) {
-        Promise.all([d3.csv("pandas/output/spending_percap_ptile.csv"), d])
-          .then(function(data) {
-            var councilsAll = data[0].sort((a, b) => {
-              return parseFloat(a.pct_remain) - parseFloat(b.pct_remain);
-            })
-            d3.select('#pct-bar-percap').selectAll("div")
-              .data(councilsAll)
-              .enter()
-              .append('div')
-              .attr('class', 'bar')
-              .style('height', `${hBar}px`)
-              .style('width', (d) => {
-                return `${barWidthScalePC(d.spending_per_voter)}%`
-              })
-              .style('background-color', (d) => {
-                return barColorScale(d.pct_remain)
-              });
-          })
-      }
-
-      function horizBar(d, i, propsObj) {
+      function horizBar(d, propsObj) {
         Promise.all([d3.csv("pandas/output/spending_percap_ptile.csv"), d, propsObj])
           .then(function(data) {
             var councilsAll = data[0].sort((a, b) => {
               return parseFloat(a.pct_remain) - parseFloat(b.pct_remain);
             })
+
+            var that = data[1].properties
+
+            for (let i = 0; i < councilsAll.length; i++) {
+              if (that.LAD13CD === councilsAll[i].area_code) {
+                councilsAll[i].selected = true;
+              } else {
+                councilsAll[i].selected = false;
+              }
+            }
+
             var scale = data[2].scale
             var divID = data[2].divID
             var keyName = data[2].keyName
 
-            d3.select('divID').selectAll("div")
+            d3.select(divID).selectAll("div")
               .data(councilsAll)
               .enter()
               .append('div')
-              .attr('class', 'bar')
+              .attr('class', (d) => {
+                return `bar ${d.area_code}`
+              })
               .style('height', `${hBar}px`)
               .style('width', (d) => {
-                return `${scale(d['keyName'])}%`
+                return `${scale(d[keyName])}%`
               })
               .style('background-color', (d) => {
                 return barColorScale(d.pct_remain)
-              });
-          })
-      }
-
-      function horizBarElectorate(d, i) {
-        Promise.all([d3.csv("pandas/output/spending_percap_ptile.csv"), d])
-          .then(function(data) {
-            var councilsAll = data[0].sort((a, b) => {
-              return parseFloat(a.pct_remain) - parseFloat(b.pct_remain);
-            })
-            d3.select('#pct-bar-electorate').selectAll("div")
-              .data(councilsAll)
-              .enter()
-              .append('div')
-              .attr('class', 'bar')
-              .style('height', `${hBar}px`)
-              .style('width', (d) => {
-                return `${barWidthScaleElectorate(d.electorate)}%`
               })
-              .style('background-color', (d) => {
-                return barColorScale(d.pct_remain)
-              });
-          })
-      }
-
-      function horizBarTotal(d, i) {
-        Promise.all([d3.csv("pandas/output/spending_percap_ptile.csv"), d])
-          .then(function(data) {
-            var councilsAll = data[0].sort((a, b) => {
-              return parseFloat(a.pct_remain) - parseFloat(b.pct_remain);
-            })
-            d3.select('#pct-bar-total').selectAll("div")
-              .data(councilsAll)
-              .enter()
-              .append('div')
-              .attr('class', 'bar')
-              .style('height', `${hBar}px`)
-              .style('width', (d) => {
-                return `${barWidthScaleTotal(d.project_eu_contribution_gbp)}%`
+              .style('border', (d) => {
+                if (!!d.selected) {
+                  return '0.1em black solid'
+                } else {
+                  return ''
+                }
               })
-              .style('background-color', (d) => {
-                return barColorScale(d.pct_remain)
+              .style('filter', (d) => {
+                if (!!d.selected) {
+                  return 'brightness(10%)'
+                } else {
+                  return ''
+                }
               });
           })
       }
@@ -148,6 +118,19 @@
               .on("click", update);
 
             function update(val = this.value) {
+              // Update bars
+              var bars = document.querySelectorAll('.bar')
+
+              for (let i = 0; i < bars.length; i++) {
+                if (bars[i].className === `bar ${val.LAD13CD}`) {
+                  bars[i].style.border = `0.1em solid black`
+                  bars[i].style.filter = 'brightness(20%)'
+                } else {
+                  bars[i].style.border = ''
+                  bars[i].style.filter = null
+                }
+              }
+
               // Join new data
               var results = [val.pctLeave, val.pctRemain]
 
@@ -218,7 +201,7 @@
                 });
             }
 
-            update(data[0].properties);
+            update(properties);
           })
       }
 
@@ -372,12 +355,21 @@
               header.className = 'england'
             }
             drawPie(d, i)
-            // horizBar(d, i)
-            // horizBar(d, i)
-            // horizBar(d, i)
-            horizBarPerCap(d, i)
-            horizBarTotal(d, i)
-            horizBarElectorate(d, i)
+            horizBar(d, {
+              'scale': barWidthScalePC,
+              'divID': "#pct-bar-percap",
+              'keyName': "spending_per_voter"
+            })
+            horizBar(d, {
+              'scale': barWidthScaleElectorate,
+              'divID': "#pct-bar-electorate",
+              'keyName': "electorate"
+            })
+            horizBar(d, {
+              'scale': barWidthScaleTotal,
+              'divID': "#pct-bar-total",
+              'keyName': "project_eu_contribution_gbp"
+            })
           });
       });
     </script>
