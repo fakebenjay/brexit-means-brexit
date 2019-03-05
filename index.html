@@ -21,16 +21,26 @@
       <br></br>
       <div id="bars" style="clear: both;">
         <label for="#pct-bar-percap">EU spending, normalized per eligible voter (£1,013,925.17)</label>
-        <div id="pct-bar-percap" style="clear: both;" class="pct-bar w-90 h3"></div>
+        <div id="pct-bar-percap" style="clear: both;" class="pct-bar h3"></div>
         <br>
         <label for="#pct-bar-electorate">Eligible voters (46,475,882)</label>
-        <div id="pct-bar-electorate" style="clear: both;" class="pct-bar w-90 h3"></div>
+        <div id="pct-bar-electorate" style="clear: both;" class="pct-bar h3"></div>
         <br>
         <label for="#pct-bar-total">Total EU spending (£100,321,726,921.54)</label>
-        <div id="pct-bar-total" style="clear: both;" class="pct-bar w-90 h3"></div>
+        <div id="pct-bar-total" style="clear: both;" class="pct-bar h3"></div>
       </div>
     </div>
     <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", function() {
+        var barDivs = document.querySelectorAll('.pct-bar')
+        var barWidth = document.getElementById('bars').offsetWidth * 0.9
+
+        for (let i = 0; i < barDivs.length; i++) {
+          barDivs[i].style.width = `${barWidth}px`
+          barDivs[i].style.offsetWidth = `${barWidth}px`
+        }
+      })
+
       function horizBar(d, propsObj) {
         Promise.all([d3.csv("pandas/output/spending.csv"), d, propsObj])
           .then(function(data) {
@@ -89,7 +99,7 @@
               .attr('height', `${hBar}px`)
               .style('fill', 'black')
               .style("stroke", 'black')
-              .style("stroke-width", '0.2em');
+              .style("stroke-width", '0.1em');
           })
       }
 
