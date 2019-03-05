@@ -39,18 +39,24 @@
             })
 
             var that = data[1].properties
+            var precedingPct = 0
+
+            var scale = data[2].scale
+            var divID = data[2].divID
+            var keyNameSnake = data[2].keyNameSnake
+            var keyNameCamel = data[2].keyNameCamel
+            var svg = data[2].svg
 
             for (let i = 0; i < councilsAll.length; i++) {
               if (that.LAD13CD === councilsAll[i].area_code) {
                 councilsAll[i].selected = true;
+                that.precedingPct = precedingPct
               } else {
                 councilsAll[i].selected = false;
               }
+              councilsAll[i].precedingPct = precedingPct
+              precedingPct += scale(councilsAll[i][keyNameSnake])
             }
-
-            var scale = data[2].scale
-            var divID = data[2].divID
-            var keyName = data[2].keyName
 
             d3.select(divID).selectAll("div")
               .data(councilsAll)
@@ -61,25 +67,43 @@
               })
               .style('height', `${hBar}px`)
               .style('width', (d) => {
-                return `${scale(d[keyName])}%`
+                return `${scale(d[keyNameSnake])}%`
               })
               .style('background-color', (d) => {
                 return barColorScale(d.pct_remain)
-              })
-              .style('border', (d) => {
-                if (!!d.selected) {
-                  return '0.1em black solid'
-                } else {
-                  return ''
-                }
-              })
-              .style('filter', (d) => {
-                if (!!d.selected) {
-                  return 'brightness(10%)'
-                } else {
-                  return ''
-                }
               });
+
+            function widthKey(d, keyName, scale) {
+              return `${scale(d.properties[keyName])}%`
+            }
+
+            svg.selectAll('rect')
+              .data([that])
+              .enter()
+              .append('rect')
+              .attr('x', (d) => {
+                return `${d.precedingPct}%`
+              })
+              .attr('y', 0)
+              .attr('width', widthKey(d, keyNameCamel, scale))
+              .attr('height', `${hBar}px`)
+              .style('fill', 'black')
+              .style("stroke", 'black')
+              .style("stroke-width", '0.2em');
+            // .style('border', (d) => {
+            //   if (!!d.selected) {
+            //     return '0.1em black solid'
+            //   } else {
+            //     return '0'
+            //   }
+            // })
+            // .style('filter', (d) => {
+            //   if (!!d.selected) {
+            //     return 'brightness(10%)'
+            //   } else {
+            //     return ''
+            //   }
+            // });
           })
       }
 
@@ -119,17 +143,18 @@
 
             function update(val = this.value) {
               // Update bars
-              var bars = document.querySelectorAll('.bar')
-
-              for (let i = 0; i < bars.length; i++) {
-                if (bars[i].className === `bar ${val.LAD13CD}`) {
-                  bars[i].style.border = `0.1em solid black`
-                  bars[i].style.filter = 'brightness(20%)'
-                } else {
-                  bars[i].style.border = ''
-                  bars[i].style.filter = null
-                }
-              }
+              debugger
+              // var bars = document.querySelectorAll('.bar')
+              //
+              // for (let i = 0; i < bars.length; i++) {
+              //   if (bars[i].className === `bar ${val.LAD13CD}`) {
+              //     bars[i].style.border = `0.1em solid black`
+              //     bars[i].style.filter = 'brightness(20%)'
+              //   } else {
+              //     bars[i].style.border = '0'
+              //     bars[i].style.filter = null
+              //   }
+              // }
 
               // Join new data
               var results = [val.pctLeave, val.pctRemain]
@@ -228,6 +253,36 @@
         .domain([20, 80])
         .range(['#bd1d1e', '#d76150', '#eb9788', '#9d80d3', '#6644bb', '#0000a3']);
 
+      var barPerCapSVG = d3.select("#pct-bar-percap")
+        .append('svg')
+        .attr('class', 'bar-svg')
+        .attr('width', '100%')
+        .attr('height', '100%')
+        .attr('viewBox', `0 0 ${Math.min(wBar, hBar)} ${Math.min(wBar, hBar)}`)
+        .attr('preserveAspectRatio', 'xMinYMin');
+      // .append("g")
+      // .attr("transform", `translate(${Math.min(wBar, hBar)},${Math.min(wBar, hBar)})`);
+
+      var barElectorateSVG = d3.select("#pct-bar-electorate")
+        .append('svg')
+        .attr('class', 'bar-svg')
+        .attr('width', '100%')
+        .attr('height', '100%')
+        .attr('viewBox', `0 0 ${Math.min(wBar, hBar)} ${Math.min(wBar, hBar)}`)
+        .attr('preserveAspectRatio', 'xMinYMin');
+      // .append("g")
+      // .attr("transform", `translate(${Math.min(wBar, hBar)},${Math.min(wBar, hBar)})`);
+
+      var barTotalSVG = d3.select("#pct-bar-total")
+        .append('svg')
+        .attr('class', 'bar-svg')
+        .attr('width', '100%')
+        .attr('height', '100%')
+        .attr('viewBox', `0 0 ${Math.min(wBar, hBar)} ${Math.min(wBar, hBar)}`)
+        .attr('preserveAspectRatio', 'xMinYMin');
+      // .append("g")
+      // .attr("transform", `translate(${Math.min(wBar, hBar)},${Math.min(wBar, hBar)})`);
+
       var wPie = document.getElementById('pie').offsetWidth;
       var hPie = document.getElementById('pie').offsetWidth;
       var radius = Math.min(wPie, hPie) / 2;
@@ -246,7 +301,8 @@
       var w = document.querySelector('#map-div').offsetWidth;
       var h = document.querySelector('#map-div').offsetHeight * .99;
 
-      var mapSVG = d3.select("#map-div").append("svg")
+      var mapSVG = d3.select("#map-div")
+        .append("svg")
         .attr("width", w)
         .attr("height", h)
         .append("g");
@@ -358,17 +414,23 @@
             horizBar(d, {
               'scale': barWidthScalePC,
               'divID': "#pct-bar-percap",
-              'keyName': "spending_per_voter"
+              'keyNameSnake': "spending_per_voter",
+              'keyNameCamel': "spendingPerVoter",
+              'svg': barPerCapSVG
             })
             horizBar(d, {
               'scale': barWidthScaleElectorate,
               'divID': "#pct-bar-electorate",
-              'keyName': "electorate"
+              'keyNameSnake': "electorate",
+              'keyNameCamel': "electorate",
+              'svg': barElectorateSVG
             })
             horizBar(d, {
               'scale': barWidthScaleTotal,
               'divID': "#pct-bar-total",
-              'keyName': "project_eu_contribution_gbp"
+              'keyNameSnake': "project_eu_contribution_gbp",
+              'keyNameCamel': "projEUContribution",
+              'svg': barTotalSVG
             })
           });
       });

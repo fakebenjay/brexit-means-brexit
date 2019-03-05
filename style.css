@@ -42,12 +42,21 @@ div#pie {
 
 .pct-bar {
     display: flex;
+    position: relative;
 }
 
 .bar {
     display: inline-block;
     padding: 0 0 0 0;
     margin: 0 0 0 0;
+    z-index: 1;
+}
+
+.bar-svg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 10;
 }
 
 .scotland {
