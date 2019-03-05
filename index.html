@@ -32,7 +32,7 @@
     </div>
     <script type="text/javascript">
       function horizBar(d, propsObj) {
-        Promise.all([d3.csv("pandas/output/spending_percap_ptile.csv"), d, propsObj])
+        Promise.all([d3.csv("pandas/output/spending.csv"), d, propsObj])
           .then(function(data) {
             var councilsAll = data[0].sort((a, b) => {
               return parseFloat(a.pct_remain) - parseFloat(b.pct_remain);
@@ -74,7 +74,7 @@
               });
 
             function widthKey(d, keyName, scale) {
-              return `${scale(d.properties[keyName])}%`
+              return `${scale(d.properties[keyName])}px`
             }
 
             svg.selectAll('rect')
@@ -82,7 +82,7 @@
               .enter()
               .append('rect')
               .attr('x', (d) => {
-                return `${d.precedingPct}%`
+                return `${d.precedingPct}px`
               })
               .attr('y', 0)
               .attr('width', widthKey(d, keyNameCamel, scale))
@@ -90,20 +90,6 @@
               .style('fill', 'black')
               .style("stroke", 'black')
               .style("stroke-width", '0.2em');
-            // .style('border', (d) => {
-            //   if (!!d.selected) {
-            //     return '0.1em black solid'
-            //   } else {
-            //     return '0'
-            //   }
-            // })
-            // .style('filter', (d) => {
-            //   if (!!d.selected) {
-            //     return 'brightness(10%)'
-            //   } else {
-            //     return ''
-            //   }
-            // });
           })
       }
 
@@ -126,14 +112,6 @@
           return (t) => arc(i(t));
         }
 
-        // function labelArcTween(a) {
-        //   var i = d3.interpolate(this._current, a);
-        //   this._current = i(0);
-        //   return function(t) {
-        //     return "translate(" + labelArc.centroid(i(t)) + ")";
-        //   }
-        // }
-
         Promise.all([d])
           .then(function(data) {
             var properties = data[0].properties
@@ -142,19 +120,36 @@
               .on("click", update);
 
             function update(val = this.value) {
-              // Update bars
-              debugger
-              // var bars = document.querySelectorAll('.bar')
-              //
-              // for (let i = 0; i < bars.length; i++) {
-              //   if (bars[i].className === `bar ${val.LAD13CD}`) {
-              //     bars[i].style.border = `0.1em solid black`
-              //     bars[i].style.filter = 'brightness(20%)'
-              //   } else {
-              //     bars[i].style.border = '0'
-              //     bars[i].style.filter = null
-              //   }
-              // }
+              //Update bars
+              barPerCapSVG.selectAll('rect')
+                .data([val])
+                .transition()
+                .attr("x", function(d) {
+                  return `${barWidthScalePC(d.precedingPerCap)}px`
+                })
+                .attr('width', (d) => {
+                  return `${barWidthScalePC(d.spendingPerVoter)}px`
+                });
+
+              barElectorateSVG.selectAll('rect')
+                .data([val])
+                .transition()
+                .attr("x", function(d) {
+                  return `${barWidthScaleElectorate(d.precedingElectorate)}px`
+                })
+                .attr('width', (d) => {
+                  return `${barWidthScaleElectorate(d.electorate)}px`
+                });
+
+              barTotalSVG.selectAll('rect')
+                .data([val])
+                .transition()
+                .attr("x", function(d) {
+                  return `${barWidthScaleTotal(d.precedingProjEU)}px`
+                })
+                .attr('width', (d) => {
+                  return `${barWidthScaleTotal(d.projEUContribution)}px`
+                });
 
               // Join new data
               var results = [val.pctLeave, val.pctRemain]
@@ -194,7 +189,6 @@
                     return `translate(${centroidPt[0]},${centroidPt[1]})`;
                   }
                 });
-              // .attrTween("transform", labelArcTween);
 
               // Enter new arcs
               piePath.enter()
@@ -239,15 +233,15 @@
 
       var barWidthScalePC = d3.scaleLinear()
         .domain([0, 1013925.169])
-        .range([0, 100]);
+        .range([0, wBar]);
 
       var barWidthScaleElectorate = d3.scaleLinear()
         .domain([0, 46475882])
-        .range([0, 100]);
+        .range([0, wBar]);
 
       var barWidthScaleTotal = d3.scaleLinear()
         .domain([0, 100321726921.54])
-        .range([0, 100]);
+        .range([0, wBar]);
 
       var barColorScale = d3.scaleQuantize()
         .domain([20, 80])
@@ -260,8 +254,6 @@
         .attr('height', '100%')
         .attr('viewBox', `0 0 ${Math.min(wBar, hBar)} ${Math.min(wBar, hBar)}`)
         .attr('preserveAspectRatio', 'xMinYMin');
-      // .append("g")
-      // .attr("transform", `translate(${Math.min(wBar, hBar)},${Math.min(wBar, hBar)})`);
 
       var barElectorateSVG = d3.select("#pct-bar-electorate")
         .append('svg')
@@ -270,8 +262,6 @@
         .attr('height', '100%')
         .attr('viewBox', `0 0 ${Math.min(wBar, hBar)} ${Math.min(wBar, hBar)}`)
         .attr('preserveAspectRatio', 'xMinYMin');
-      // .append("g")
-      // .attr("transform", `translate(${Math.min(wBar, hBar)},${Math.min(wBar, hBar)})`);
 
       var barTotalSVG = d3.select("#pct-bar-total")
         .append('svg')
@@ -280,8 +270,6 @@
         .attr('height', '100%')
         .attr('viewBox', `0 0 ${Math.min(wBar, hBar)} ${Math.min(wBar, hBar)}`)
         .attr('preserveAspectRatio', 'xMinYMin');
-      // .append("g")
-      // .attr("transform", `translate(${Math.min(wBar, hBar)},${Math.min(wBar, hBar)})`);
 
       var wPie = document.getElementById('pie').offsetWidth;
       var hPie = document.getElementById('pie').offsetWidth;
@@ -293,8 +281,6 @@
         .append("svg")
         .attr("width", wPie)
         .attr("height", hPie)
-        // .attr('viewBox', `0 0 ${Math.min(wPie, hPie)} ${Math.min(wPie, hPie)}`)
-        //.attr('preserveAspectRatio','xMinYMin')
         .append("g")
         .attr("transform", `translate(${Math.min(wPie, hPie) / 2},${Math.min(wPie, hPie) / 2})`);
 
@@ -306,7 +292,6 @@
         .attr("width", w)
         .attr("height", h)
         .append("g");
-      // .call(zoom);
 
       var projection = d3.geoAlbers()
         .center([1.5, 55.2])
@@ -340,7 +325,7 @@
         .range([0.1, 1.0]);
 
       Promise.all([
-        d3.csv("pandas/output/spending_percap_ptile.csv"),
+        d3.csv("pandas/output/spending.csv"),
         d3.json("local-area.json")
       ]).then(function(allData) {
         var stats = allData[0]
@@ -358,6 +343,9 @@
           let projEUContribution = parseFloat(stats[i].project_eu_contribution_gbp).toFixed(2)
           let spendingPerVoter = parseFloat(stats[i].spending_per_voter).toFixed(2)
           let percentile = parseFloat(stats[i].spending_percentile)
+          let precedingPerCap = parseFloat(stats[i].preceding_per_cap)
+          let precedingProjEU = parseFloat(stats[i].preceding_proj_eu)
+          let precedingElectorate = parseFloat(stats[i].preceding_electorate)
 
           for (let j = 0; j < mapJSON.length; j++) {
             let areaID = mapJSON[j].properties.LAD13CD
@@ -374,6 +362,9 @@
               mapJSON[j].properties.projEUContribution = projEUContribution
               mapJSON[j].properties.spendingPerVoter = spendingPerVoter
               mapJSON[j].properties.percentile = percentile
+              mapJSON[j].properties.precedingPerCap = precedingPerCap
+              mapJSON[j].properties.precedingProjEU = precedingProjEU
+              mapJSON[j].properties.precedingElectorate = precedingElectorate
 
               //Stop looking through the JSON
               break;
