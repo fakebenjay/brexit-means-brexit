@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <!-- <script src="https://d3js.org/d3-format.v1.min.js"></script> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css">
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
     <title>Brexit Means Brexit</title>
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -30,6 +30,8 @@
         <div id="pct-bar-total" style="clear: both;" class="pct-bar h3"></div>
       </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.js"></script>
     <script type="text/javascript">
       document.addEventListener("DOMContentLoaded", function() {
         var barDivs = document.querySelectorAll('.pct-bar')
@@ -298,6 +300,10 @@
       var w = document.querySelector('#map-div').offsetWidth;
       var h = document.querySelector('#map-div').offsetHeight * .99;
 
+      var select = d3.select("#map-div")
+        .append("select")
+        .attr('id', 'select');
+
       var mapSVG = d3.select("#map-div")
         .append("svg")
         .attr("width", w)
@@ -382,6 +388,66 @@
             }
           }
         }
+
+        var selectOptions = stats.map((council) => {
+          return {
+            itemGroup: council.region,
+            itemValue: council.area_code,
+            itemName: council.brexit_constituency
+          }
+        })
+
+        var groupArray = []
+
+        for (let i = 0; i < selectOptions.length; i++) {
+          if (!groupArray.includes(selectOptions[i].itemGroup)) {
+            groupArray.push(selectOptions[i].itemGroup)
+          }
+        }
+
+        var selectGroups = groupArray.map((region) => {
+          return {
+            groupName: region
+          }
+        })
+
+        $('#select').selectize({
+          sortField: [{
+              field: 'groupName',
+              direction: 'asc'
+            },
+            {
+              field: 'itemGroup',
+              direction: 'asc'
+            },
+            {
+              field: 'itemName',
+              direction: 'asc'
+            },
+            {
+              field: '$score'
+            }
+          ],
+          options: selectOptions,
+          optgroups: selectGroups,
+          optgroupField: 'itemGroup',
+          optgroupLabelField: 'groupName',
+          optgroupValueField: 'groupName',
+          valueField: 'itemValue',
+          labelField: 'itemName',
+          searchField: ['itemGroup', 'itemName'],
+          create: false
+        });
+
+        // select.selectAll("option")
+        //   .data(stats)
+        //   .enter().append("option")
+        //   .attr("value", (d) => {
+        //     return d.area_code
+        //   })
+        //   .text((d) => {
+        //     return d.brexit_constituency
+        //   });
 
         mapSVG.selectAll("path")
           .data(mapJSON)
