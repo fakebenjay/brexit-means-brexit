@@ -99,7 +99,7 @@
               .attr('height', `${hBar}px`)
               .style('fill', 'black')
               .style("stroke", 'black')
-              .style("stroke-width", '0.1em');
+              .style("stroke-width", '1px');
           })
       }
 
@@ -241,26 +241,10 @@
       //1013925.169 per capita council sum
       //46475882 eligible voters
 
-      var barWidthScalePC = d3.scaleLinear()
-        .domain([0, 1013925.169])
-        .range([0, wBar]);
-
-      var barWidthScaleElectorate = d3.scaleLinear()
-        .domain([0, 46475882])
-        .range([0, wBar]);
-
-      var barWidthScaleTotal = d3.scaleLinear()
-        .domain([0, 100321726921.54])
-        .range([0, wBar]);
-
-      var barColorScale = d3.scaleQuantize()
-        .domain([20, 80])
-        .range(['#bd1d1e', '#d76150', '#eb9788', '#9d80d3', '#6644bb', '#0000a3']);
-
       var barPerCapSVG = d3.select("#pct-bar-percap")
         .append('svg')
         .attr('class', 'bar-svg')
-        .attr('width', '100%')
+        .attr('width', `100%`)
         .attr('height', '100%')
         .attr('viewBox', `0 0 ${Math.min(wBar, hBar)} ${Math.min(wBar, hBar)}`)
         .attr('preserveAspectRatio', 'xMinYMin');
@@ -268,7 +252,7 @@
       var barElectorateSVG = d3.select("#pct-bar-electorate")
         .append('svg')
         .attr('class', 'bar-svg')
-        .attr('width', '100%')
+        .attr('width', `100%`)
         .attr('height', '100%')
         .attr('viewBox', `0 0 ${Math.min(wBar, hBar)} ${Math.min(wBar, hBar)}`)
         .attr('preserveAspectRatio', 'xMinYMin');
@@ -276,10 +260,27 @@
       var barTotalSVG = d3.select("#pct-bar-total")
         .append('svg')
         .attr('class', 'bar-svg')
-        .attr('width', '100%')
+        .attr('width', `100%`)
         .attr('height', '100%')
         .attr('viewBox', `0 0 ${Math.min(wBar, hBar)} ${Math.min(wBar, hBar)}`)
         .attr('preserveAspectRatio', 'xMinYMin');
+
+      //For some reason, I have to reduce the outer bound of the range to 90% of itself. Div crap?
+      var barWidthScalePC = d3.scaleLinear()
+        .domain([0, 1013925.169])
+        .range([0, wBar * .9]);
+
+      var barWidthScaleElectorate = d3.scaleLinear()
+        .domain([0, 46475882])
+        .range([0, wBar * .9]);
+
+      var barWidthScaleTotal = d3.scaleLinear()
+        .domain([0, 100321726921.54])
+        .range([0, wBar * .9]);
+
+      var barColorScale = d3.scaleQuantize()
+        .domain([20, 80])
+        .range(['#bd1d1e', '#d76150', '#eb9788', '#9d80d3', '#6644bb', '#0000a3']);
 
       var wPie = document.getElementById('pie').offsetWidth;
       var hPie = document.getElementById('pie').offsetWidth;
