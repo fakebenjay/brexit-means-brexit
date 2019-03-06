@@ -40,6 +40,17 @@ div#pie {
     display: inherit;
 }
 
+#select-div {
+    margin-top: 2%;
+    margin-left: 2%;
+    position: fixed;
+}
+
+.selectize-control, .selectize-input, select#select {
+    min-width: 16em;
+    max-width: 16em;
+}
+
 .pct-bar {
     display: flex;
     position: relative;

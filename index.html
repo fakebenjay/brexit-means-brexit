@@ -13,7 +13,9 @@
   </head>
 
   <body>
-    <div id="map-div" class="vh-100 w-50 fl"></div>
+    <div id="map-div" class="vh-100 w-50 fl">
+      <div id="select-div"></div>
+    </div>
     <div id="infobox" class="vh-100 w-50 fr">
       <h1 id="dist-name"></h1>
       <div id="pie" class="w-50 fl"></div>
@@ -300,7 +302,7 @@
       var w = document.querySelector('#map-div').offsetWidth;
       var h = document.querySelector('#map-div').offsetHeight * .99;
 
-      var select = d3.select("#map-div")
+      var select = d3.select("div#select-div")
         .append("select")
         .attr('id', 'select');
 
@@ -341,12 +343,9 @@
         .domain([5.179221, 3274.196])
         .range([0.1, 1.0]);
 
-      Promise.all([
-        d3.csv("pandas/output/spending.csv"),
-        d3.json("local-area.json")
-      ]).then(function(allData) {
-        var stats = allData[0]
-        var mapJSON = allData[1].features
+      function init(data) {
+        var stats = data[0]
+        var mapJSON = data[1].features
 
         for (let i = 0; i < stats.length; i++) {
           let areaCode = stats[i].area_code
@@ -428,6 +427,7 @@
               field: '$score'
             }
           ],
+          // onChange: change,
           options: selectOptions,
           optgroups: selectGroups,
           optgroupField: 'itemGroup',
@@ -438,16 +438,6 @@
           searchField: ['itemGroup', 'itemName'],
           create: false
         });
-
-        // select.selectAll("option")
-        //   .data(stats)
-        //   .enter().append("option")
-        //   .attr("value", (d) => {
-        //     return d.area_code
-        //   })
-        //   .text((d) => {
-        //     return d.brexit_constituency
-        //   });
 
         mapSVG.selectAll("path")
           .data(mapJSON)
@@ -466,7 +456,11 @@
           })
           .attr('fill-opacity', d => spendingOpacity(d.properties.spendingPerVoter))
           .on("click", (d, i) => {
-            header = document.querySelector('#dist-name')
+            var $dropdown = $('select#select')
+            var selectize = $dropdown[0].selectize
+            selectize.addItem(d.properties.LAD13CD)
+
+            var header = document.querySelector('#dist-name')
             header.innerText = d.properties.LAD13NM
 
             if (d.properties.region === "Scotland") {
@@ -501,7 +495,12 @@
               'svg': barTotalSVG
             })
           });
-      });
+      }
+
+      Promise.all([
+        d3.csv("pandas/output/spending.csv"),
+        d3.json("local-area.json")
+      ]).then(init);
     </script>
   </body>
 
