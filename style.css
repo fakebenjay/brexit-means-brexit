@@ -4,7 +4,7 @@ body {
 
 #map-div path:hover {
     stroke: black;
-    stroke-width: 1;
+    stroke-width: 0.5;
 }
 
 @font-face {

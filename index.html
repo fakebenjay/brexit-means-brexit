@@ -410,6 +410,17 @@
           }
         })
 
+        jQuery.fn.d3Click = function() {
+          this.each(function(i, e) {
+            var evt = new MouseEvent("click");
+            e.dispatchEvent(evt);
+          });
+        };
+
+        function clickMap(id) {
+          $(`#${id}`).d3Click()
+        }
+
         $('#select').selectize({
           sortField: [{
               field: 'groupName',
@@ -427,7 +438,7 @@
               field: '$score'
             }
           ],
-          // onChange: change,
+          onChange: clickMap,
           options: selectOptions,
           optgroups: selectGroups,
           optgroupField: 'itemGroup',
@@ -455,13 +466,25 @@
             return color(value)
           })
           .attr('fill-opacity', d => spendingOpacity(d.properties.spendingPerVoter))
-          .on("click", (d, i) => {
+          .on("click", function(d, i) {
             var $dropdown = $('select#select')
             var selectize = $dropdown[0].selectize
             selectize.addItem(d.properties.LAD13CD)
 
             var header = document.querySelector('#dist-name')
             header.innerText = d.properties.LAD13NM
+
+            var paths = d3.select('#map-div').selectAll('path')
+              .style('stroke-width', '0')
+              .on('hover', function(d, i) {
+                var offPath = d3.select(this)
+                offPath.style('stroke', 'black')
+                  .style('stroke-width', '0.5');
+              })
+
+            var path = d3.select(this)
+            path.style('stroke', 'black')
+              .style('stroke-width', '1');
 
             if (d.properties.region === "Scotland") {
               header.className = 'scotland'
