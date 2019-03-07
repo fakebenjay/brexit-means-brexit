@@ -2,7 +2,12 @@ body {
     font-family: 'Overpass', sans-serif;
 }
 
-#map-div path:hover {
+path.clicked {
+    stroke: black;
+    stroke-width: 1;
+}
+
+#map-div path.unclicked:hover {
     stroke: black;
     stroke-width: 0.5;
 }

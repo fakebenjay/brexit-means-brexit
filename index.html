@@ -343,6 +343,16 @@
         .domain([5.179221, 3274.196])
         .range([0.1, 1.0]);
 
+      function regionName(name) {
+        if (name === 'East') {
+          return "East of England"
+        } else if ((name.includes("North") || name.includes("South")) && !name.includes("Ireland")) {
+          return `${name} England`
+        } else {
+          return name
+        }
+      }
+
       function init(data) {
         var stats = data[0]
         var mapJSON = data[1].features
@@ -350,7 +360,7 @@
         for (let i = 0; i < stats.length; i++) {
           let areaCode = stats[i].area_code
           let brexitConstituency = stats[i].brexit_constituency
-          let region = stats[i].region
+          let region = regionName(stats[i].region)
           let electorate = stats[i].electorate
           let remain = stats[i].remain
           let leave = stats[i].leave
@@ -388,11 +398,11 @@
           }
         }
 
-        var selectOptions = stats.map((council) => {
+        var selectOptions = mapJSON.map((council) => {
           return {
-            itemGroup: council.region,
-            itemValue: council.area_code,
-            itemName: council.brexit_constituency
+            itemGroup: council.properties.region,
+            itemValue: council.properties.LAD13CD,
+            itemName: council.properties.LAD13NM
           }
         })
 
@@ -461,6 +471,7 @@
           .attr("name", (d) => {
             return d.properties.LAD13NM
           })
+          .classed('unclicked', true)
           .style("fill", (d) => {
             var value = d.properties.pctRemain;
             return color(value)
@@ -475,16 +486,12 @@
             header.innerText = d.properties.LAD13NM
 
             var paths = d3.select('#map-div').selectAll('path')
-              .style('stroke-width', '0')
-              .on('hover', function(d, i) {
-                var offPath = d3.select(this)
-                offPath.style('stroke', 'black')
-                  .style('stroke-width', '0.5');
-              })
+              .classed('clicked', false)
+              .classed('unclicked', true);
 
             var path = d3.select(this)
-            path.style('stroke', 'black')
-              .style('stroke-width', '1');
+              .classed('clicked', true)
+              .classed('unclicked', false);
 
             if (d.properties.region === "Scotland") {
               header.className = 'scotland'
