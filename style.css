@@ -16,6 +16,17 @@ path.clicked {
     stroke-width: 0.5;
 }
 
+#map-div {
+    position: relative;
+}
+
+#legend {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 10px;
+    margin-left: 10px;
+}
+
 @font-face {
     font-family: "klavika-bold";
     src: url("fonts/Klavika Bold.otf");

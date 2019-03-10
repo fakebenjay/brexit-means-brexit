@@ -350,7 +350,19 @@ var mapSVG = d3.select("#map-div")
 	.append("svg")
 	.attr("width", w)
 	.attr("height", h)
-	.append("g");
+	.append("g")
+	.attr('transform', `translate(${w/10},0)`);
+
+// var g = mapSVG.select('g')
+// 	.transform(30, 0);
+
+var mapLegend = d3.select("#map-div")
+	.append('div')
+	.attr('id', 'legend')
+	.style('width', `${h/3}px`)
+	.style('height', `${h/3}px`);
+
+
 
 var projection = d3.geoAlbers()
 	.center([1.5, 55.2])
