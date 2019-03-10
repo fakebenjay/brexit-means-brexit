@@ -24,6 +24,10 @@ function horizBar(d, propsObj) {
 			var keyNameCamel = data[2].keyNameCamel
 			var svg = data[2].svg
 
+			var decade = 20
+			var barObjs = []
+			var x = 0
+
 			for (let i = 0; i < councilsAll.length; i++) {
 				if (that.LAD13CD === councilsAll[i].area_code) {
 					councilsAll[i].selected = true;
@@ -33,21 +37,56 @@ function horizBar(d, propsObj) {
 				}
 				councilsAll[i].precedingPct = precedingPct
 				precedingPct += scale(councilsAll[i][keyNameSnake])
+
+				if (councilsAll[i].pct_remain - decade >= 10 || i === councilsAll.length - 1) {
+					if (councilsAll[i].pct_remain - decade >= 10) {
+						var width = councilsAll[i].precedingPct - x
+					} else if (i === councilsAll.length - 1) {
+						var width = scale.range()[1] - x
+					}
+
+					x += width
+					var color = barColorScale(decade)
+					var className = `remain-${decade}`
+					decade += 10
+
+					barObjs.push({
+						width: width,
+						color: color,
+						className: className
+					})
+				}
 			}
 
+			// for (let i = 0; i < councilsAll.length; i++) {
+			// 	if (councilsAll[i].pct_remain - decade >= 10 || i === councilsAll.length - 1) {
+			// 		var width = councilsAll[i][preKeyName] - x
+			// 		x += width
+			// 		var color = barColorScale(decade)
+			// 		var className = `remain-${decade}`
+			// 		decade += 10
+			//
+			// 		barObjs.push({
+			// 			width: width,
+			// 			color: color,
+			// 			className: className
+			// 		})
+			// 	}
+			// }
+
 			d3.select(divID).selectAll("div")
-				.data(councilsAll)
+				.data(barObjs)
 				.enter()
 				.append('div')
 				.attr('class', (d) => {
-					return `bar ${d.area_code}`
+					return `bar ${d.className}`
 				})
 				.style('height', `${hBar}px`)
 				.style('width', (d) => {
-					return `${scale(d[keyNameSnake])}%`
+					return `${d.width}%`
 				})
 				.style('background-color', (d) => {
-					return barColorScale(d.pct_remain)
+					return d.color
 				});
 
 			function widthKey(d, keyName, scale) {
@@ -59,6 +98,7 @@ function horizBar(d, propsObj) {
 				.enter()
 				.append('rect')
 				.attr('x', (d) => {
+					debugger
 					return `${d.precedingPct}px`
 				})
 				.attr('y', 0)
@@ -551,8 +591,6 @@ function init(data) {
 			document.querySelector('#valid-votes > span').innerText = numeral(d.properties.validVotes).format('0,0')
 			document.querySelector('#votes-cast > span').innerText = numeral(d.properties.votesCast).format('0,0')
 			document.querySelector('#rejected-ballots > span').innerText = numeral(d.properties.rejectedBallots).format('0,0')
-
-			debugger
 
 			if (d.properties.pctLeave > d.properties.pctRemain) {
 				document.querySelector('#vote-rank span').innerHTML = `<strong>${numeral(d.properties.leaveRank).format('0o')} most Leave</strong><br>of 398 districts`
