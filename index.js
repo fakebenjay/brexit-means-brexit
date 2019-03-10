@@ -98,7 +98,6 @@ function horizBar(d, propsObj) {
 				.enter()
 				.append('rect')
 				.attr('x', (d) => {
-					debugger
 					return `${d.precedingPct}px`
 				})
 				.attr('y', 0)
@@ -593,9 +592,9 @@ function init(data) {
 			document.querySelector('#rejected-ballots > span').innerText = numeral(d.properties.rejectedBallots).format('0,0')
 
 			if (d.properties.pctLeave > d.properties.pctRemain) {
-				document.querySelector('#vote-rank span').innerHTML = `<strong>${numeral(d.properties.leaveRank).format('0o')} most Leave</strong><br>of 398 districts`
+				document.querySelector('#vote-rank span').innerHTML = `<strong>${numeral(d.properties.leaveRank).format('0o')} most Leave</strong><br>of 270 Leave districts<br>(398 total)`
 			} else {
-				document.querySelector('#vote-rank span').innerHTML = `<strong>${numeral(d.properties.remainRank).format('0o')} most Remain</strong><br>of 398 districts`
+				document.querySelector('#vote-rank span').innerHTML = `<strong>${numeral(d.properties.remainRank).format('0o')} most Remain</strong><br>of 128 Remain districts<br>(398 total)`
 			}
 
 			document.querySelector('span#percap-spend').innerText = `£${numeral(d.properties.spendingPerVoter).format('£0,0.00')} (Ranked ${numeral(parseInt(d.properties.percapRank)).format('0o')}, ${numeral(parseInt(d.properties.percentile)).format('0o')} percentile, ${numeral(parseInt(d.properties.spendingPerVoter)/443.0366).format('0.[00]%')} of £443.04 median)`
