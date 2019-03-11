@@ -385,7 +385,6 @@ var mapLegend = d3.select("#legend")
 	.style('height', `${hLegend}px`)
 	.style('margin', `${parseFloat(legendMargin)}px ${parseFloat(legendMargin)}px ${parseFloat(legendMargin)}px ${parseFloat(legendMargin)}px`);
 
-
 var legendData = [
 	{
 		id: 'legend-20',
@@ -394,23 +393,23 @@ var legendData = [
 	},
 	{
 		id: 'legend-30',
-		maxColor: '#d76150',
-		minColor: '#fbefed'
+		maxColor: '#b6182d',
+		minColor: '#f7e7ea'
 	},
 	{
 		id: 'legend-40',
-		maxColor: '#eb9788',
-		minColor: '#fdf4f3'
+		maxColor: '#af143b',
+		minColor: '#f7e7eb'
 	},
 	{
 		id: 'legend-50',
-		maxColor: '#9d80d3',
-		minColor: '#f5f2fa'
+		maxColor: '#47008f',
+		minColor: '#ece5f3'
 	},
 	{
 		id: 'legend-60',
-		maxColor: '#6644bb',
-		minColor: '#efecf8'
+		maxColor: '#310099',
+		minColor: '#eae5f4'
 	},
 	{
 		id: 'legend-70',
