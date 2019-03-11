@@ -176,7 +176,8 @@ function drawPie(d, i) {
 					.data([val])
 					.transition()
 					.attr('x', d => `${legendXScale(d.pctRemain) + legendMargin - legendOffset}px`)
-					.attr('y', d => `${legendYScale(d.percentile) + legendMargin - legendOffset}px`);
+					.attr('y', d => `${legendYScale(d.percentile) + legendMargin - legendOffset}px`)
+				//.attr('transform', `rotate(0, ${legendXScale(d.pctRemain)+legendMargin}, ${legendYScale(d.percentile)+legendMargin})`);
 
 				//Update bars
 				barPerCapSVG.selectAll('rect')
@@ -435,7 +436,6 @@ var legendSVG = d3.select("#legend")
 	.attr('width', `${wLegend + legendMargin + legendMargin}px`)
 	.attr('height', `${hLegend + legendMargin + legendMargin}px`)
 	.attr('transform', `translate(-${legendMargin}, -${legendMargin})`)
-	.attr('viewBox', `0 0 100% 100%`)
 	.attr('preserveAspectRatio', 'xMinYMin');
 
 var projection = d3.geoAlbers()
@@ -604,6 +604,21 @@ function init(data) {
 		create: false
 	});
 
+	legendSVG.selectAll('circle')
+		.data(mapJSON)
+		.enter()
+		.append('circle')
+		.attr('class', 'scatter')
+		.attr('id', d => `scatter-${d.properties.LAD13CD}`)
+		.attr('r', '1px')
+		.attr('cx', (d) => {
+			return `${legendXScale(d.properties.pctRemain) + legendMargin}px`
+		})
+		.attr('cy', (d) => {
+			return `${legendYScale(d.properties.percentile) + legendMargin}px`
+		})
+		.style('fill', 'black');
+
 	mapSVG.selectAll("path")
 		.data(mapJSON)
 		.enter()
@@ -648,17 +663,31 @@ function init(data) {
 				header.className = 'england'
 			}
 
-			legendSVG.selectAll('rect')
-				.data([d])
-				.enter()
-				.append('rect')
-				.attr('x', d => `${legendXScale(d.properties.pctRemain) + legendMargin - legendOffset}px`)
-				.attr('y', d => `${legendYScale(d.properties.percentile) + legendMargin - legendOffset}px`)
-				.attr('width', `${legendOffset * 2}px`)
-				.attr('height', `${legendOffset * 2}px`)
-				.style('fill', 'black')
-				.style("stroke", 'black')
-				.style("stroke-width", '0.001px');
+			legendSVG.selectAll(`circle`)
+				.transition(200)
+				.attr('r', '1px')
+				.style("stroke-width", '0px');
+
+			var selectedID = d.properties.LAD13CD
+			legendSVG.select(`#scatter-${selectedID}`)
+				.raise()
+				.transition(200)
+				.attr('r', `4px`)
+				.style("stroke", 'white')
+				.style("stroke-width", '1px');
+
+			// legendSVG.selectAll('rect')
+			// 	.data([d])
+			// 	.enter()
+			// 	.append('rect')
+			// 	.attr('x', d => `${legendXScale(d.properties.pctRemain) + legendMargin - legendOffset}px`)
+			// 	.attr('y', d => `${legendYScale(d.properties.percentile) + legendMargin - legendOffset}px`)
+			// 	.attr('width', `${legendOffset * 2}px`)
+			// 	.attr('height', `${legendOffset * 2}px`)
+			// 	//.attr('transform', `rotate(45, ${legendXScale(d.properties.pctRemain)+legendMargin}, ${legendYScale(d.properties.percentile)+legendMargin})`)
+			// 	.style('fill', 'black')
+			// 	.style("stroke", 'black')
+			// 	.style("stroke-width", '0.001px');
 
 			drawPie(d, i)
 
