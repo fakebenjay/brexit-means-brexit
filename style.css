@@ -23,8 +23,6 @@ path.clicked {
 #legend {
     position: absolute;
     bottom: 0;
-    margin-bottom: 10px;
-    margin-left: 10px;
 }
 
 @font-face {
@@ -83,11 +81,15 @@ div#pie {
     z-index: 1;
 }
 
-.bar-svg {
+.bar-svg, .legend-svg {
     position: absolute;
     left: 0;
     top: 0;
     z-index: 10;
+}
+
+rect {
+    z-index: 15;
 }
 
 .scotland {

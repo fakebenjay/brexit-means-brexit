@@ -171,6 +171,13 @@ function drawPie(d, i) {
 				// document.querySelector('#rejected-ballots > span').innerText = val.rejectedBallots
 				// document.querySelector('#electorate > span').innerText = val.electorate
 
+				//Update legend
+				legendSVG.selectAll('rect')
+					.data([val])
+					.transition()
+					.attr('x', d => `${legendXScale(d.pctRemain) + legendMargin - legendOffset}px`)
+					.attr('y', d => `${legendYScale(d.percentile) + legendMargin - legendOffset}px`);
+
 				//Update bars
 				barPerCapSVG.selectAll('rect')
 					.data([val])
@@ -353,14 +360,31 @@ var mapSVG = d3.select("#map-div")
 	.append("g")
 	.attr('transform', `translate(${w/10},0)`);
 
-// var g = mapSVG.select('g')
-// 	.transform(30, 0);
+var wLegend = w / 3.5
+var hLegend = w / 3.5
+var legendMargin = wLegend / 5
+var legendOffset = wLegend / 40
 
-var mapLegend = d3.select("#map-div")
-	.append('div')
-	.attr('id', 'legend')
-	.style('width', `${w/3}px`)
-	.style('height', `${w/3}px`);
+var legendXScale = d3.scaleLinear()
+	.domain([20, 80])
+	.range([0, wLegend]);
+
+var legendYScale = d3.scaleLinear()
+	.domain([100, 0])
+	.range([0, hLegend]);
+
+// var mapLegend = d3.select("#map-div")
+// 	.append('div')
+// 	.attr('id', 'legend')
+// 	.style('width', `${wLegend}px`)
+// 	.style('height', `${hLegend}px`)
+// 	.style('margin', `${parseFloat(legendMargin)}px ${parseFloat(legendMargin)}px ${parseFloat(legendMargin)}px ${parseFloat(legendMargin)}px`);
+
+var mapLegend = d3.select("#legend")
+	.style('width', `${wLegend}px`)
+	.style('height', `${hLegend}px`)
+	.style('margin', `${parseFloat(legendMargin)}px ${parseFloat(legendMargin)}px ${parseFloat(legendMargin)}px ${parseFloat(legendMargin)}px`);
+
 
 var legendData = [
 	{
@@ -402,15 +426,18 @@ var legendBars = d3.select("#legend")
 	.append('span')
 	.attr('id', d => d.id)
 	.attr('class', "legend-bar")
-	.style('width', (d) => {
-		var w = document.getElementById('legend').style.width
-		return `${parseFloat(w)/6}px`
-	})
-	.style('height', (d) => {
-		var h = document.getElementById('legend').style.width
-		return `${parseFloat(h)}px`
-	})
-	.style('background-image', d => `linear-gradient(${d.maxColor}, ${d.minColor})`);
+	.style('width', `${parseFloat(wLegend)/6}px`)
+	.style('height', `${parseFloat(hLegend)}px`)
+	.style('background-image', d => `linear-gradient(${d.maxColor}, ${d.minColor})`)
+
+var legendSVG = d3.select("#legend")
+	.append('svg')
+	.attr('class', 'legend-svg')
+	.attr('width', `${wLegend + legendMargin + legendMargin}px`)
+	.attr('height', `${hLegend + legendMargin + legendMargin}px`)
+	.attr('transform', `translate(-${legendMargin}, -${legendMargin})`)
+	.attr('viewBox', `0 0 100% 100%`)
+	.attr('preserveAspectRatio', 'xMinYMin');
 
 var projection = d3.geoAlbers()
 	.center([1.5, 55.2])
@@ -596,6 +623,7 @@ function init(data) {
 		})
 		.attr('fill-opacity', d => spendingOpacity(d.properties.spendingPerVoter))
 		.on("click", function (d, i) {
+			d3.select('svg.legend-svg').moveToFront();
 			var $dropdown = $('select#select')
 			var selectize = $dropdown[0].selectize
 			selectize.addItem(d.properties.LAD13CD)
@@ -620,7 +648,21 @@ function init(data) {
 			} else {
 				header.className = 'england'
 			}
+
+			legendSVG.selectAll('rect')
+				.data([d])
+				.enter()
+				.append('rect')
+				.attr('x', d => `${legendXScale(d.properties.pctRemain) + legendMargin - legendOffset}px`)
+				.attr('y', d => `${legendYScale(d.properties.percentile) + legendMargin - legendOffset}px`)
+				.attr('width', `${legendOffset * 2}px`)
+				.attr('height', `${legendOffset * 2}px`)
+				.style('fill', 'black')
+				.style("stroke", 'black')
+				.style("stroke-width", '0.001px');
+
 			drawPie(d, i)
+
 			horizBar(d, {
 				'scale': barWidthScalePC,
 				'divID': "#pct-bar-percap",
