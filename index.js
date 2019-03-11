@@ -359,10 +359,58 @@ var mapSVG = d3.select("#map-div")
 var mapLegend = d3.select("#map-div")
 	.append('div')
 	.attr('id', 'legend')
-	.style('width', `${h/3}px`)
-	.style('height', `${h/3}px`);
+	.style('width', `${w/3}px`)
+	.style('height', `${w/3}px`);
 
+var legendData = [
+	{
+		id: 'legend-20',
+		maxColor: '#bd1d1e',
+		minColor: '#f8e8e8'
+	},
+	{
+		id: 'legend-30',
+		maxColor: '#d76150',
+		minColor: '#fbefed'
+	},
+	{
+		id: 'legend-40',
+		maxColor: '#eb9788',
+		minColor: '#fdf4f3'
+	},
+	{
+		id: 'legend-50',
+		maxColor: '#9d80d3',
+		minColor: '#f5f2fa'
+	},
+	{
+		id: 'legend-60',
+		maxColor: '#6644bb',
+		minColor: '#efecf8'
+	},
+	{
+		id: 'legend-70',
+		maxColor: '#0000a3',
+		minColor: '#e5e5f5'
+	}
+]
 
+var legendBars = d3.select("#legend")
+	.selectAll('span')
+	.data(legendData)
+	.enter()
+	.append('span')
+	.attr('id', d => d.id)
+	.attr('class', "legend-bar")
+	.style('width', (d) => {
+		var w = document.getElementById('legend').style.width
+		return `${parseFloat(w)/6}px`
+	})
+	.style('height', (d) => {
+		var h = document.getElementById('legend').style.width
+		return `${parseFloat(h)}px`
+	})
+	.style('background-image', d => `linear-gradient(${d.maxColor}, ${d.minColor})`);
 
 var projection = d3.geoAlbers()
 	.center([1.5, 55.2])
