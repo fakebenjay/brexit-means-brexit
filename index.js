@@ -617,7 +617,30 @@ function init(data) {
 		.attr('cy', (d) => {
 			return `${legendYScale(d.properties.percentile) + legendMargin}px`
 		})
-		.style('fill', 'black');
+		.style('fill', 'black')
+		.on('click', (d) => {
+			clickMap(`${d.properties.LAD13CD}`)
+		})
+		.on('mouseover', function () {
+			var that = d3.select(this)
+			that.raise()
+				.attr('r', `4px`)
+				.style('fill', '#black')
+				.style('stroke', 'white')
+				.style('stroke-width', '1px');
+		})
+		.on('mouseout', function () {
+			var that = d3.select(this)
+			if (that.attr('class').includes('scatter-clicked')) {
+				that.transition(200)
+					.style('fill', '#F7C603')
+			} else {
+				that.transition(200)
+					.attr('r', `1px`)
+					.style('fill', 'black')
+					.style('stroke-width', '0px');
+			}
+		});
 
 	mapSVG.selectAll("path")
 		.data(mapJSON)
@@ -664,15 +687,19 @@ function init(data) {
 			}
 
 			legendSVG.selectAll(`circle`)
+				.classed('scatter-clicked', false)
 				.transition(200)
 				.attr('r', '1px')
-				.style("stroke-width", '0px');
+				.style("stroke-width", '0px')
+				.style('fill', 'black');
 
 			var selectedID = d.properties.LAD13CD
 			legendSVG.select(`#scatter-${selectedID}`)
 				.raise()
+				.classed('scatter-clicked', true)
 				.transition(200)
 				.attr('r', `4px`)
+				.style('fill', '#F7C603')
 				.style("stroke", 'white')
 				.style("stroke-width", '1px');
 
