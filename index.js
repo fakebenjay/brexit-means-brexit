@@ -621,7 +621,25 @@ function init(data) {
 		.on('click', (d) => {
 			clickMap(`${d.properties.LAD13CD}`)
 		})
-		.on('mouseover', function () {
+		.on('mouseover', function (d) {
+			var coordinates = [d3.event.layerX, d3.event.layerY]
+			var vertOffset = document.querySelector('#legend-tooltip').offsetHeight
+
+			d3.select('#legend-tooltip')
+				.select('.council')
+				.text(d.properties.LAD13NM);
+
+			d3.select('#legend-tooltip')
+				.select('.region')
+				.text(d.properties.region);
+
+			d3.select('#legend-tooltip')
+				.style('top', `${coordinates[1] - vertOffset}px`)
+				.style('left', `${coordinates[0] + 5}px`);
+
+			d3.select('#legend-tooltip')
+				.classed('hidden', false);
+
 			var that = d3.select(this)
 			that.raise()
 				.attr('r', `4px`)
@@ -630,6 +648,9 @@ function init(data) {
 				.style('stroke-width', '1px');
 		})
 		.on('mouseout', function () {
+			d3.select('#legend-tooltip')
+				.classed('hidden', true);
+
 			var that = d3.select(this)
 			if (that.attr('class').includes('scatter-clicked')) {
 				that.transition(200)
@@ -760,6 +781,29 @@ function init(data) {
 			document.querySelector('span#total-electorate').innerText = `${numeral(d.properties.electorate).format('0,0')} (Ranked ${numeral(parseInt(d.properties.electorateRank)).format('0o')}, ${numeral(parseInt(d.properties.electorate)/46475882).format('0.[00]%')} of 46,475,882)`
 			document.querySelector('span#total-spend').innerText = `£${numeral(d.properties.projEUContribution).format('£0,0.00')} (Ranked ${numeral(parseInt(d.properties.projEURank)).format('0o')}, ${numeral(parseFloat(d.properties.projEUContribution)/100321726921.54).format('0.[000]%')} of £100,321,726,921.54)`
 			d.properties.electorate
+		})
+		.on('mouseover', (d) => {
+			var coordinates = [d3.event.layerX, d3.event.layerY]
+			var vertOffset = document.querySelector('#map-tooltip').offsetHeight
+
+			d3.select('#map-tooltip')
+				.select('.council')
+				.text(d.properties.LAD13NM);
+
+			d3.select('#map-tooltip')
+				.select('.region')
+				.text(d.properties.region);
+
+			d3.select('#map-tooltip')
+				.style('top', `${coordinates[1] - vertOffset}px`)
+				.style('left', `${coordinates[0] + 5}px`);
+
+			d3.select('#map-tooltip')
+				.classed('hidden', false);
+		})
+		.on('mouseout', () => {
+			d3.select('#map-tooltip')
+				.classed('hidden', true);
 		});
 }
 

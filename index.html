@@ -15,8 +15,17 @@
 
   <body>
     <div id="map-div" class="vh-100 w-50 fl">
+      <div class="tooltip hidden" id="map-tooltip">
+        <p class='council'></p>
+        <small class='region'></small>
+      </div>
       <div id="select-div"></div>
-      <div id="legend"></div>
+      <div id="legend">
+        <div class="tooltip hidden" id="legend-tooltip">
+          <p class='council'></p>
+          <small class='region'></small>
+        </div>
+      </div>
     </div>
     <div id="infobox" class="vh-100 w-50 fr hidden">
       <h1 id="dist-name"></h1>
