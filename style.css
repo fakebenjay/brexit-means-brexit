@@ -34,7 +34,7 @@ p.council {
 
 path.clicked {
     stroke: black;
-    stroke-width: 1;
+    stroke-width: 2;
 }
 
 #map-div path.unclicked:hover {
@@ -49,6 +49,7 @@ path.clicked {
 #legend {
     position: absolute;
     bottom: 0;
+    display: flex;
 }
 
 @font-face {
@@ -62,8 +63,8 @@ path.clicked {
 }
 
 @font-face {
-    font-family: "resolution-blackletter";
-    src: url("fonts/ResolutionBlackletter.otf");
+    font-family: "northern-ireland";
+    src: url("fonts/northern-ireland-headline.woff.ttf");
 }
 
 @font-face {
@@ -148,7 +149,8 @@ rect {
 
 .northern-ireland {
     /* font-family: resolution-blackletter, sans-serif; */
-    font-family: millisime, sans-serif;
+    /* font-family: millisime, sans-serif; */
+    font-family: northern-ireland, sans-serif;
     font-weight: 700;
     font-style: normal;
     background-color: #81A930;
