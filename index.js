@@ -237,7 +237,7 @@ function drawPie(d, i) {
       // Update existing arcs
       piePath.transition().duration(200).attrTween('d', arcTween);
 
-      d3.selectAll('text')
+      d3.selectAll('text.arc')
         .transition()
         .duration(200)
         .tween('text', function (a) {
