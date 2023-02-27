@@ -188,6 +188,7 @@ function drawPie(d, i) {
           'y',
           d => `${legendYScale(d.percentile) + legendMargin - legendOffset}px`
         );
+
       //.attr('transform', `rotate(0, ${legendXScale(d.pctRemain)+legendMargin}, ${legendYScale(d.percentile)+legendMargin})`);
 
       //Update bars
@@ -742,6 +743,81 @@ function init(data) {
       }
     });
 
+  legendSVG
+    .append('text')
+    .text('30%')
+    .attr('class', 'leave-text')
+    .attr('x', d => `${legendXScale(30) + legendMargin - legendOffset}px`)
+    .attr('y', d => `${legendYScale(100) + legendMargin - legendOffset}px`)
+    .style('text-anchor', 'end')
+    .style('font-size', '8pt');
+
+  legendSVG
+    .append('text')
+    .text('70%')
+    .attr('class', 'remain-text')
+    .style('text-anchor', 'start')
+    .style('font-size', '8pt')
+    .attr('x', function (d) {
+      return `${
+        legendXScale(70) +
+        legendMargin -
+        legendOffset +
+        this.getBoundingClientRect().width / 2
+      }px`;
+    })
+    .attr('y', d => `${legendYScale(100) + legendMargin - legendOffset}px`);
+
+  legendSVG
+    .append('text')
+    .text('Remain vote')
+    .attr('class', 'xlegend-text')
+    .style('text-anchor', 'middle')
+    .style('font-size', '8pt')
+    .attr('x', function (d) {
+      return `${legendXScale(50) + legendMargin - legendOffset}px`;
+    })
+    .attr('y', d => `${legendYScale(100) + legendMargin - legendOffset}px`);
+
+  legendSVG
+    .append('text')
+    .text('1')
+    .attr('class', 'toprank-text')
+    .style('text-anchor', 'end')
+    .style('font-size', '8pt')
+    .attr('x', function (d) {
+      return `${legendXScale(20) + legendMargin - legendOffset}px`;
+    })
+    .attr('y', d => `${legendYScale(90) + legendMargin - legendOffset}px`);
+
+  legendSVG
+    .append('text')
+    .text('398')
+    .attr('class', 'bottomrank-text')
+    .style('text-anchor', 'end')
+    .style('font-size', '8pt')
+    .attr('x', function (d) {
+      return `${legendXScale(20) + legendMargin - legendOffset}px`;
+    })
+    .attr('y', d => `${legendYScale(0) + legendMargin - legendOffset}px`);
+  // .style('transform', 'rotate(90deg)');
+
+  legendSVG
+    .append('text')
+    .text('EU funding rank')
+    .attr('class', 'ylegend-text')
+    .style('text-anchor', 'middle')
+    .style('font-size', '8pt')
+    .attr('x', function (d) {
+      return `${legendXScale(20) + legendMargin - legendOffset}px`;
+    })
+    .attr('y', d => `${legendYScale(50) + legendMargin - legendOffset}px`)
+    .style('transform', function () {
+      return `translate(${-legendXScale(
+        50
+      )}px,${legendYScale(15)}px) rotate(270deg)`;
+    });
+
   mapSVG
     .append('path')
     .datum(regionMesh)
@@ -931,7 +1007,7 @@ function init(data) {
       var name = this.attributes['name'].value;
       var regionClass = this.classList[0];
 
-      var that = d3.select(`circle[name='${name}']`);
+      var that = d3.select(`circle[name="${name}"]`);
       that
         .raise()
         .attr('r', `4px`)
@@ -972,5 +1048,5 @@ function init(data) {
 
 Promise.all([
   d3.csv('pandas/output/spending-ranked.csv'),
-  d3.json('local-regions.json')
+  d3.json('local-regions-simpfix.json')
 ]).then(init);
