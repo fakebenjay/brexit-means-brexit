@@ -352,7 +352,14 @@ var barWidthScaleTotal = d3
 var barColorScale = d3
   .scaleQuantize()
   .domain([20, 80])
-  .range(['#bd1d1e', '#d76150', '#eb9788', '#9d80d3', '#6644bb', '#0000a3']);
+  .range([
+    'rgba(189,29,30,1)',
+    'rgba(215,97,80,1)',
+    'rgba(235,151,136,1)',
+    'rgba(157,128,211,1)',
+    'rgba(102,68,187,1)',
+    'rgba(0,0,163,1)'
+  ]);
 
 var wPie = document.getElementById('pie').offsetWidth;
 var hPie = document.getElementById('pie').offsetWidth;
@@ -483,7 +490,14 @@ var color = d3
   .domain([20, 80])
   // .range(['#b40000', '#a20032', '#900064', '#640090', '#3200a2', '#0000b4']);
   // .range(['#a30000', '#940032', '#800064', '#640080', '#320091', '#0000a3']);
-  .range(['#bd1d1e', '#b6182d', '#af143b', '#47008f', '#310099', '#0000a3']);
+  .range([
+    'rgba(189,29,30,1)',
+    'rgba(215,97,80,1)',
+    'rgba(235,151,136,1)',
+    'rgba(157,128,211,1)',
+    'rgba(102,68,187,1)',
+    'rgba(0,0,163,1)'
+  ]);
 // .range(['#a30000', '#a30032', '#a30064', '#6400a3', '#3200a3', '#0000a3']);
 // .range(['#a30000', '#a3002d', '#a3005a', '#5a00a3', '#2d00a3', '#0000a3']);
 // .range(['#a30000', '#9c001a', '#94002e', '#47008f', '#310099', '#0000a3']);
@@ -830,7 +844,7 @@ function init(data) {
     .attr('fill', 'none');
 
   mapSVG
-    .selectAll('path')
+    .selectAll('council')
     .data(mapJSON)
     .enter()
     .append('path')
@@ -850,9 +864,10 @@ function init(data) {
     )
     .style('fill', d => {
       var value = d.properties.pctRemain;
-      return color(value);
+      var opacity = spendingOpacity(d.properties.spendingPerVoter);
+      return color(value).replace('1)', opacity + ')');
     })
-    .attr('fill-opacity', d => spendingOpacity(d.properties.spendingPerVoter))
+    // .attr('fill-opacity', d => spendingOpacity(d.properties.spendingPerVoter))
     .on('click', function (d, i) {
       d3.selectAll('.scatter').style('display', 'block');
       d3.selectAll('.region-path').style('opacity', 1);
